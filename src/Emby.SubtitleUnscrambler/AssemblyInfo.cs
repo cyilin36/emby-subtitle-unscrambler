@@ -4,5 +4,5 @@ using System.Reflection;
 [assembly: AssemblyDescription("Repairs scrambled SRT subtitles in Emby Web.")]
 [assembly: AssemblyCompany("cyilin36")]
 [assembly: AssemblyProduct("Emby Subtitle Unscrambler")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("1.0.1.0")]
+[assembly: AssemblyFileVersion("1.0.1.0")]

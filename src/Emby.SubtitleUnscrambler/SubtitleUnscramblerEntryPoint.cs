@@ -98,17 +98,24 @@ namespace Emby.SubtitleUnscrambler
             }
 
             var content = File.ReadAllText(indexPath);
-            const string headEnd = "</head>";
             var withoutOldTags = ExistingModuleTagPattern.Replace(
                 content,
                 string.Empty);
             var index = withoutOldTags.IndexOf(
-                headEnd,
+                "</head>",
                 StringComparison.OrdinalIgnoreCase);
             if (index < 0)
             {
+                // Emby 4.10 does not always emit a closing head tag.
+                index = withoutOldTags.IndexOf(
+                    "<body",
+                    StringComparison.OrdinalIgnoreCase);
+            }
+
+            if (index < 0)
+            {
                 throw new InvalidOperationException(
-                    "Unsupported Emby web index.html layout. " +
+                    "Could not find </head> or <body in Emby web index.html. " +
                     "Subtitle Unscrambler was not injected.");
             }
 

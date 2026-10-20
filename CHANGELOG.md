@@ -12,6 +12,14 @@ and this project follows [Semantic Versioning](https://semver.org/).
 - Added a tag-driven GitHub Actions workflow that publishes stable tags as
   Latest and suffixed tags as pre-releases.
 
+## [1.0.1] - 2026-10-20
+
+### Fixed
+
+- Injects the Web module before `<body>` when Emby's `index.html` has no
+  closing `</head>` tag, as seen in some Emby 4.10 installations.
+- Reports a clear startup error only when neither insertion point exists.
+
 ## [1.0.0] - 2026-10-20
 
 ### Added
