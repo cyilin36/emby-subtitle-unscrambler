@@ -3,7 +3,8 @@ name: release
 on:
   push:
     tags:
-      - "v*"
+      - "[0-9]*.[0-9]*.[0-9]*"
+      - "v[0-9]*.[0-9]*.[0-9]*"
 
 permissions:
   contents: write
@@ -15,6 +16,38 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Determine release channel
+        id: channel
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="$GITHUB_REF_NAME"
+
+          if [[ "$tag" =~ ^v?([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            version="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}"
+            prerelease=false
+            make_latest=true
+            channel=stable
+          elif [[ "$tag" =~ ^v?([0-9]+)\.([0-9]+)\.([0-9]+)-([0-9A-Za-z][0-9A-Za-z.-]*)$ ]]; then
+            version="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}-${BASH_REMATCH[4]}"
+            prerelease=true
+            make_latest=false
+            channel=prerelease
+          else
+            echo "Unsupported release tag: $tag" >&2
+            echo "Expected x.y.z or x.y.z-suffix, optionally prefixed with v." >&2
+            exit 1
+          fi
+
+          {
+            echo "version=$version"
+            echo "prerelease=$prerelease"
+            echo "make_latest=$make_latest"
+            echo "channel=$channel"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Tag $tag => $channel release $version"
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
@@ -43,7 +76,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          version="${GITHUB_REF_NAME#v}"
+          version="${{ steps.channel.outputs.version }}"
           mkdir -p dist
           cd src/Emby.SubtitleUnscrambler/bin/Release/netstandard2.0
           cp Emby.SubtitleUnscrambler.dll "$GITHUB_WORKSPACE/dist/"
@@ -58,10 +91,30 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          version="${{ steps.channel.outputs.version }}"
+          is_prerelease="${{ steps.channel.outputs.prerelease }}"
+          make_latest="${{ steps.channel.outputs.make_latest }}"
+          title="Emby Subtitle Unscrambler $version"
+
+          if [[ "$is_prerelease" == "true" ]]; then
+            title="$title (Pre-release)"
+          fi
+
           if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
             gh release upload "$GITHUB_REF_NAME" dist/* --clobber
+          elif [[ "$is_prerelease" == "true" ]]; then
+            gh release create "$GITHUB_REF_NAME" dist/* \
+              --title "$title" \
+              --prerelease \
+              --generate-notes
           else
             gh release create "$GITHUB_REF_NAME" dist/* \
-              --title "Emby Subtitle Unscrambler $GITHUB_REF_NAME" \
+              --title "$title" \
               --generate-notes
           fi
+
+          printf '{"name":"%s","prerelease":%s,"make_latest":"%s"}' \
+            "$title" "$is_prerelease" "$make_latest" |
+            gh api --method PATCH \
+              "repos/${GITHUB_REPOSITORY}/releases/tags/${GITHUB_REF_NAME}" \
+              --input -

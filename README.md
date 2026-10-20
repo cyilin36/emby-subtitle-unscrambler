@@ -135,15 +135,27 @@ pushed.
 1. Update the version fields in `Emby.SubtitleUnscrambler.csproj`,
    `AssemblyInfo.cs`, and `CHANGELOG.md`.
 2. Commit the change.
-3. Create and push a matching tag:
+3. Create and push a matching tag using one of the forms below.
+
+The `release` workflow runs the tests, builds the DLL, creates the ZIP, and
+publishes both files to a GitHub Release. No manual binary upload is required.
+
+Release tags without a suffix are stable releases and are marked as GitHub's
+Latest release:
 
 ```powershell
-git tag v1.0.1
-git push origin main v1.0.1
+git tag 1.0.1
+git push origin main 1.0.1
 ```
 
-The `release` workflow then runs the tests, builds the DLL, creates the ZIP, and
-publishes both files to a GitHub Release. No manual binary upload is required.
+Tags with a suffix create pre-releases. They are never marked as Latest:
+
+```powershell
+git tag 1.0.1-beta.1
+git push origin main 1.0.1-beta.1
+```
+
+Tags prefixed with `v`, such as `v1.0.1`, are also accepted.
 
 ## How It Works Internally
 

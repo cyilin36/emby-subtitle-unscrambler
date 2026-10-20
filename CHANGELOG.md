@@ -9,8 +9,8 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
-- Added a tag-driven GitHub Actions workflow that builds and publishes release
-  assets automatically.
+- Added a tag-driven GitHub Actions workflow that publishes stable tags as
+  Latest and suffixed tags as pre-releases.
 
 ## [1.0.0] - 2026-10-20
 
