@@ -131,7 +131,7 @@ At Emby startup, the server-side entry point:
 - Copies an embedded JavaScript module into `dashboard-ui\modules`.
 - Backs up `dashboard-ui\index.html` once.
 - Injects a versioned `<script>` tag before `</head>`.
-- Removes legacy injection left by older test builds.
+- Replaces superseded module injection before writing the current version.
 
 The browser module wraps `window.fetch`. Other requests pass through unchanged.
 Subtitle SRT responses are cached in memory and returned as a `text/vtt`
