@@ -27,12 +27,10 @@ jobs:
           if [[ "$tag" =~ ^v?([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
             version="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}"
             prerelease=false
-            make_latest=true
             channel=stable
           elif [[ "$tag" =~ ^v?([0-9]+)\.([0-9]+)\.([0-9]+)-([0-9A-Za-z][0-9A-Za-z.-]*)$ ]]; then
             version="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}-${BASH_REMATCH[4]}"
             prerelease=true
-            make_latest=false
             channel=prerelease
           else
             echo "Unsupported release tag: $tag" >&2
@@ -43,7 +41,6 @@ jobs:
           {
             echo "version=$version"
             echo "prerelease=$prerelease"
-            echo "make_latest=$make_latest"
             echo "channel=$channel"
           } >> "$GITHUB_OUTPUT"
 
@@ -93,7 +90,6 @@ jobs:
           set -euo pipefail
           version="${{ steps.channel.outputs.version }}"
           is_prerelease="${{ steps.channel.outputs.prerelease }}"
-          make_latest="${{ steps.channel.outputs.make_latest }}"
           title="Emby Subtitle Unscrambler $version"
 
           if [[ "$is_prerelease" == "true" ]]; then
@@ -112,9 +108,3 @@ jobs:
               --title "$title" \
               --generate-notes
           fi
-
-          printf '{"name":"%s","prerelease":%s,"make_latest":"%s"}' \
-            "$title" "$is_prerelease" "$make_latest" |
-            gh api --method PATCH \
-              "repos/${GITHUB_REPOSITORY}/releases/tags/${GITHUB_REF_NAME}" \
-              --input -
