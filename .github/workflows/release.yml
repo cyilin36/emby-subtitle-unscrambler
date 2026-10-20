@@ -1,0 +1,67 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Test subtitle conversion
+        run: node tests/subtitle-unscrambler.test.js
+
+      - name: Restore .NET dependencies
+        run: dotnet restore src/Emby.SubtitleUnscrambler/Emby.SubtitleUnscrambler.csproj
+
+      - name: Build plugin
+        run: >-
+          dotnet build
+          src/Emby.SubtitleUnscrambler/Emby.SubtitleUnscrambler.csproj
+          --configuration Release
+          --no-restore
+
+      - name: Package release assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#v}"
+          mkdir -p dist
+          cd src/Emby.SubtitleUnscrambler/bin/Release/netstandard2.0
+          cp Emby.SubtitleUnscrambler.dll "$GITHUB_WORKSPACE/dist/"
+          cd "$GITHUB_WORKSPACE"
+          zip -j "dist/Emby.SubtitleUnscrambler-${version}.zip" \
+            README.md LICENSE CHANGELOG.md \
+            dist/Emby.SubtitleUnscrambler.dll
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" dist/* --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" dist/* \
+              --title "Emby Subtitle Unscrambler $GITHUB_REF_NAME" \
+              --generate-notes
+          fi

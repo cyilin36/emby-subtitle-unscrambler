@@ -53,7 +53,9 @@ combination.
 
 ## Installation
 
-1. Download `Emby.SubtitleUnscrambler.dll` from Releases.
+1. Download
+   [`Emby.SubtitleUnscrambler.dll`](https://github.com/cyilin36/emby-subtitle-unscrambler/releases/latest/download/Emby.SubtitleUnscrambler.dll)
+   from Releases.
 2. Stop Emby Server completely.
 3. Open the Emby `plugins` directory. With the default Windows data directory,
    this is `%APPDATA%\Emby-Server\programdata\plugins`. If you use a custom data
@@ -123,6 +125,25 @@ Create a release ZIP on Windows:
 ```powershell
 .\scripts\package.ps1
 ```
+
+## Publishing a Release
+
+Binary files are intentionally not committed to the source repository. The
+release workflow builds and attaches them automatically when a version tag is
+pushed.
+
+1. Update the version fields in `Emby.SubtitleUnscrambler.csproj`,
+   `AssemblyInfo.cs`, and `CHANGELOG.md`.
+2. Commit the change.
+3. Create and push a matching tag:
+
+```powershell
+git tag v1.0.1
+git push origin main v1.0.1
+```
+
+The `release` workflow then runs the tests, builds the DLL, creates the ZIP, and
+publishes both files to a GitHub Release. No manual binary upload is required.
 
 ## How It Works Internally
 
