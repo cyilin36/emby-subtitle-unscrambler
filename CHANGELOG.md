@@ -16,4 +16,3 @@ and this project follows [Semantic Versioning](https://semver.org/).
 - Supports UTF-8, UTF-16LE, and UTF-16BE subtitle decoding.
 - Removes basic SRT display tags.
 - Restores the original subtitle request when conversion fails.
-- Removes legacy web-client injection from the earlier test build.

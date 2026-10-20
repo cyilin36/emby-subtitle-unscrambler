@@ -62,18 +62,6 @@ combination.
 5. Start Emby Server.
 6. Refresh the Emby Web page with `Ctrl+F5`.
 
-### Upgrading From Chinese Subtitle Fixer
-
-Earlier test builds used the DLL name `Emby.ChineseSubtitleFixer.dll` and the
-same plugin GUID. Emby cannot load both DLLs at once.
-
-Before installing this version:
-
-1. Stop Emby.
-2. Delete `Emby.ChineseSubtitleFixer.dll` from the plugins directory.
-3. Copy `Emby.SubtitleUnscrambler.dll` into the plugins directory.
-4. Start Emby and hard-refresh the web page.
-
 ## What It Fixes
 
 - Web-player subtitle tracks delivered from SRT as `Stream.vtt`.
@@ -151,8 +139,8 @@ Subtitle SRT responses are cached in memory and returned as a `text/vtt`
 
 ## Troubleshooting
 
-- **Still garbled:** confirm the old `Emby.ChineseSubtitleFixer.dll` is gone,
-  restart Emby, and hard-refresh the browser.
+- **Still garbled:** confirm the plugin DLL is present, restart Emby, and
+  hard-refresh the browser.
 - **Plugin is not applied after an Emby update:** restart Emby to let the plugin
   patch the new web client.
 - **Only some tracks fail:** check whether they are SRT, ASS/SSA, PGS/VobSub, or
@@ -169,10 +157,8 @@ Subtitle SRT responses are cached in memory and returned as a `text/vtt`
 安装方法：
 
 1. 停止 Emby。
-2. 如果以前装过 `Emby.ChineseSubtitleFixer.dll`，先删除它，避免新插件与旧插件
-   因为 GUID 相同而冲突。
-3. 将 `Emby.SubtitleUnscrambler.dll` 放入 Emby 的 `plugins` 目录。
-4. 启动 Emby，然后在浏览器按 `Ctrl+F5` 强制刷新。
+2. 将 `Emby.SubtitleUnscrambler.dll` 放入 Emby 的 `plugins` 目录。
+3. 启动 Emby，然后在浏览器按 `Ctrl+F5` 强制刷新。
 
 目前的适用范围是 Emby Web 中直接把 SRT 字幕作为字幕轨读取的情况。它不能修复
 ASS/SSA、PGS/VobSub、已经烧录到视频里的字幕，也不能替代 Emby 后端编码器修复。
