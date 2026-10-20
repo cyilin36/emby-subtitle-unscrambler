@@ -1,0 +1,48 @@
+name: build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Test subtitle conversion
+        run: node tests/subtitle-unscrambler.test.js
+
+      - name: Restore .NET dependencies
+        run: dotnet restore src/Emby.SubtitleUnscrambler/Emby.SubtitleUnscrambler.csproj
+
+      - name: Build plugin
+        run: >-
+          dotnet build
+          src/Emby.SubtitleUnscrambler/Emby.SubtitleUnscrambler.csproj
+          --configuration Release
+          --no-restore
+
+      - name: Upload plugin DLL
+        uses: actions/upload-artifact@v4
+        with:
+          name: Emby.SubtitleUnscrambler
+          path: src/Emby.SubtitleUnscrambler/bin/Release/netstandard2.0/Emby.SubtitleUnscrambler.dll
+          if-no-files-found: error

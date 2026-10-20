@@ -1,0 +1,22 @@
+# Build output
+bin/
+obj/
+artifacts/
+
+# IDE files
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Test and package output
+node_modules/
+coverage/
+*.nupkg
+
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini

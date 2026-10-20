@@ -1,0 +1,7 @@
+* text=auto eol=lf
+
+*.srt text eol=crlf
+*.dll binary
+*.png binary
+*.jpg binary
+*.zip binary
